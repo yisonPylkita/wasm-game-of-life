@@ -3,11 +3,11 @@ mod utils;
 use std::fmt;
 use wasm_bindgen::prelude::*;
 
-// // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
-// // allocator.
-// #[cfg(feature = "wee_alloc")]
-// #[global_allocator]
-// static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
+// When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
+// allocator.
+#[cfg(feature = "wee_alloc")]
+#[global_allocator]
+static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 #[wasm_bindgen]
 #[repr(u8)]
@@ -47,6 +47,18 @@ impl World {
             height,
             cells,
         }
+    }
+
+    pub fn width(&self) -> u32 {
+        self.width as u32
+    }
+
+    pub fn height(&self) -> u32 {
+        self.height as u32
+    }
+
+    pub fn cells(&self) -> *const Cell {
+        self.cells.as_ptr()
     }
 
     pub fn tick(&mut self) {
@@ -101,13 +113,17 @@ impl World {
 
 impl fmt::Display for World {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        // We're going to also insert \n for every row
+        let mut buf = Vec::with_capacity(self.width * self.height + self.height);
         for line in self.cells.as_slice().chunks(self.width as usize) {
             for &cell in line {
                 let symbol = if cell == Cell::Dead { '◻' } else { '◼' };
-                write!(f, "{}", symbol)?;
+                buf.push(symbol);
             }
-            write!(f, "\n")?;
+            buf.push('\n');
         }
+        let s: String = buf.into_iter().collect();
+        f.write_str(&s)?;
 
         Ok(())
     }
