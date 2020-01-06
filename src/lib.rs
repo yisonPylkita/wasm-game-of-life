@@ -30,8 +30,8 @@ impl World {
         // TODO: move it somewhere
         utils::set_panic_hook();
 
-        let width = 128 as usize;
-        let height = 32 as usize;
+        let width = 512 as usize;
+        let height = 128 as usize;
         let cells = (0..width * height)
             .map(|i| {
                 if i % 2 == 0 || i % 7 == 0 {
