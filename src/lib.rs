@@ -17,11 +17,19 @@ pub enum Cell {
     Alive = 1,
 }
 
+const WASM_MEMORY_BUFFER_SIZE: usize = 2;
+static mut WASM_MEMORY_BUFFER: [u8; WASM_MEMORY_BUFFER_SIZE] = [0; WASM_MEMORY_BUFFER_SIZE];
+
+const WORLD_WIDTH: usize = 256;
+const WORLD_HEIGHT: usize = 256;
+const PIXEL_SIZE_IN_BYTES: usize = 4; // RGBA
+
 #[wasm_bindgen]
 pub struct World {
     width: usize,
     height: usize,
     cells: Vec<Cell>,
+    rendered_image: [u8; WORLD_WIDTH * WORLD_HEIGHT * PIXEL_SIZE_IN_BYTES],
 }
 
 #[wasm_bindgen]
@@ -30,9 +38,7 @@ impl World {
         // TODO: move it somewhere
         utils::set_panic_hook();
 
-        let width = 400 as usize;
-        let height = 120 as usize;
-        let cells = (0..width * height)
+        let cells = (0..WORLD_WIDTH * WORLD_HEIGHT)
             .map(|i| {
                 if i % 2 == 0 || i % 7 == 0 {
                     Cell::Alive
@@ -43,22 +49,27 @@ impl World {
             .collect();
 
         World {
-            width,
-            height,
+            width: WORLD_WIDTH,
+            height: WORLD_HEIGHT,
             cells,
+            rendered_image: [0xff; WORLD_WIDTH * WORLD_HEIGHT * PIXEL_SIZE_IN_BYTES],
         }
     }
 
+    // TODO: We should return size of rendered image not cells
+    // TODO: Ok, another way - do we need grid lines?
     pub fn width(&self) -> u32 {
         self.width as u32
     }
 
+    // TODO: We should return size of rendered image not cells
+    // TODO: Ok, another way - do we need grid lines?
     pub fn height(&self) -> u32 {
         self.height as u32
     }
 
-    pub fn cells(&self) -> *const Cell {
-        self.cells.as_ptr()
+    pub fn rendered_image_ptr(&self) -> *const u8 {
+        self.rendered_image.as_ptr()
     }
 
     pub fn tick(&mut self) {
@@ -106,25 +117,17 @@ impl World {
         count
     }
 
-    pub fn render(&self) -> String {
-        self.to_string()
-    }
-}
-
-impl fmt::Display for World {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        // We're going to also insert \n for every row
-        let mut buf = Vec::with_capacity(self.width * self.height + self.height);
+    pub fn render(&mut self) {
+        let mut idx: usize = 0;
         for line in self.cells.as_slice().chunks(self.width as usize) {
             for &cell in line {
-                let symbol = if cell == Cell::Dead { '◻' } else { '◼' };
-                buf.push(symbol);
+                let color = if cell == Cell::Dead { 0xff } else { 0x00 };
+                self.rendered_image[idx] = color; // R
+                self.rendered_image[idx + 1] = color; // G
+                self.rendered_image[idx + 2] = color; // B
+                self.rendered_image[idx + 3] = 255; // A
+                idx += 4;
             }
-            buf.push('\n');
         }
-        let s: String = buf.into_iter().collect();
-        f.write_str(&s)?;
-
-        Ok(())
     }
 }
