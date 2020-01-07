@@ -1,6 +1,5 @@
 mod utils;
 
-use std::fmt;
 use wasm_bindgen::prelude::*;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
@@ -16,9 +15,6 @@ pub enum Cell {
     Dead = 0,
     Alive = 1,
 }
-
-const WASM_MEMORY_BUFFER_SIZE: usize = 2;
-static mut WASM_MEMORY_BUFFER: [u8; WASM_MEMORY_BUFFER_SIZE] = [0; WASM_MEMORY_BUFFER_SIZE];
 
 const WORLD_WIDTH: usize = 256;
 const WORLD_HEIGHT: usize = 256;
