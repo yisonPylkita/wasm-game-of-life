@@ -1,7 +1,10 @@
 language: rust
 sudo: false
-
 cache: cargo
+
+env:
+  global:
+    - RUSTFLAGS="-C link-args=-zstack-size=16777216"
 
 matrix:
   include:
