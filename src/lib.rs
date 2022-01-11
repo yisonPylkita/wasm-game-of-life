@@ -2,12 +2,6 @@ mod utils;
 
 use wasm_bindgen::prelude::*;
 
-// When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
-// allocator.
-#[cfg(feature = "wee_alloc")]
-#[global_allocator]
-static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
-
 #[wasm_bindgen]
 #[repr(u8)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -16,8 +10,8 @@ pub enum Cell {
     Alive = 1,
 }
 
-const WORLD_WIDTH: usize = 256;
-const WORLD_HEIGHT: usize = 256;
+const WORLD_WIDTH: usize = 1024;
+const WORLD_HEIGHT: usize = 1024;
 const PIXEL_SIZE_IN_BYTES: usize = 4; // RGBA
 
 #[wasm_bindgen]
@@ -25,7 +19,7 @@ pub struct World {
     width: usize,
     height: usize,
     cells: Vec<Cell>,
-    rendered_image: [u8; WORLD_WIDTH * WORLD_HEIGHT * PIXEL_SIZE_IN_BYTES],
+    rendered_image: Vec<u8>,
 }
 
 #[wasm_bindgen]
@@ -48,7 +42,7 @@ impl World {
             width: WORLD_WIDTH,
             height: WORLD_HEIGHT,
             cells,
-            rendered_image: [0xff; WORLD_WIDTH * WORLD_HEIGHT * PIXEL_SIZE_IN_BYTES],
+            rendered_image: vec![0x00; WORLD_WIDTH * WORLD_HEIGHT * PIXEL_SIZE_IN_BYTES],
         }
     }
 
