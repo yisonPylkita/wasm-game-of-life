@@ -3,6 +3,9 @@ name = "wasm-game-of-life"
 version = "0.1.0"
 authors = ["Wojciech Bartnik <yisonPylkita@gmail.com>"]
 edition = "2018"
+description = "Game of Life in Rust WASM"
+repository = "https://github.com/yisonPylkita/wasm-game-of-life"
+license-file = "LICENSE.md"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
