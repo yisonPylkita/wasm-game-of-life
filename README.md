@@ -2,9 +2,18 @@
 Conway's Game of Life written in Rust WASM
 
 ## 🚴 Usage
+### Prerequisites
+#### Install Rustup
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+#### Install `wasm-pack`
+```bash
+cargo install wasm-pack
+```
 ### 🛠️ Building
 ```bash
-wasm-pack build
+wasm-pack build --target web
 ```
 
 ### Using
